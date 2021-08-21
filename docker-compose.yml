@@ -1,12 +1,21 @@
 version: "3"
 services:
   db:
-    # TODO: configura tu imagen de base de datos, te recomendamos una de estas:
-    # https://hub.docker.com/_/mongo
-    # https://hub.docker.com/_/postgres
-    # https://hub.docker.com/_/mysql
-    networks:
-      - private
+   image: mysql:5
+   volumes:
+     - ./db-data:/var/lib/mysql
+   ports: 
+    - 33060:3306
+   environment:
+     MYSQL_ROOT_PASSWORD: supersecret
+     MYSQL_DATABASE: bq
+     MYSQL_USER: bq
+     MYSQL_PASSWORD: secret
+
+   restart: always
+   networks:
+    - public
+    - private
   node:
     image: node:12 # https://hub.docker.com/_/node/
     user: node
@@ -14,7 +23,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8080
-      DB_URL: <CONNECTION STRING>
+      DB_URL: mysql://bq:secret@db:3306/bq
       JWT_SECRET: xxxxxxxx
       ADMIN_EMAIL: admin@localhost
       ADMIN_PASSWORD: changeme
