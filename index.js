@@ -1,5 +1,4 @@
 const express = require('express');
-const mysql = require('mysql');
 const config = require('./config');
 const authMiddleware = require('./middleware/auth');
 const errorHandler = require('./middleware/error');
@@ -9,16 +8,10 @@ const pkg = require('./package.json');
 const { port, dbUrl, secret } = config;
 const app = express();
 
-// TODO: Conexión a la Base de Datos (MongoDB o MySQL)
-const connection = mysql.createConnection(dbUrl);
-connection.connect();
-connection.query('SELECT 1 + 1 AS solution', (error, results) => {
-  if (error) {
-    return console.error(error);
-  }
-  console.log(`The solution is: ${results[0].solution}`);
-});
-connection.end();
+// Conexión a la Base de Datos (MySQL)
+
+const db = require('./database');
+db.connect();
 
 app.set('config', config);
 app.set('pkg', pkg);

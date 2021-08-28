@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-
+const connection = require('../database');
 const {
   requireAuth,
   requireAdmin,
@@ -23,6 +23,26 @@ const initAdminUser = (app, next) => {
   };
 
   // TODO: crear usuaria admin
+  const postAdminUser = async (adminUser, next) => {
+  try {
+
+    const newUser = {
+      email : adminUser.email,
+      password: adminUser.password,
+      isAdmin : adminUser.roles.admin
+    };
+   await connection.query('INSERT INTO users SET ?', [newUser]);
+
+   return next;
+  
+    } catch (error) {
+      if (error !== 200) return error;
+    }
+  
+  };
+
+  postAdminUser(adminUser, next);
+  
   next();
 };
 
