@@ -23,26 +23,33 @@ const initAdminUser = (app, next) => {
   };
 
   // TODO: crear usuaria admin
+
   const postAdminUser = async (adminUser, next) => {
-  try {
+    try {
+      const newUser = {
+        email: adminUser.email,
+        password: adminUser.password,
+        isAdmin: adminUser.roles.admin
+      };
+      let rows;
+      await connection.query('SELECT * FROM users  WHERE email = ?', [newUser.email], (err, succes) => {
+        if (err) console.log(err);
+        rows = succes;
+        console.log('length ', rows.length);
+        if (rows.length === 0) {
 
-    const newUser = {
-      email : adminUser.email,
-      password: adminUser.password,
-      isAdmin : adminUser.roles.admin
-    };
-   await connection.query('INSERT INTO users SET ?', [newUser]);
-
-   return next;
-  
+         connection.query('INSERT INTO users SET ?', [newUser]);
+        }
+        return next;
+      });
     } catch (error) {
       if (error !== 200) return error;
     }
-  
+
   };
 
   postAdminUser(adminUser, next);
-  
+
   next();
 };
 
@@ -137,6 +144,7 @@ module.exports = (app, next) => {
    * @code {403} si ya existe usuaria con ese `email`
    */
   app.post('/users', requireAdmin, (req, resp, next) => {
+    console.log(req.body)
   });
 
   /**
