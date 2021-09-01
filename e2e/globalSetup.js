@@ -33,7 +33,7 @@ const __e2e = {
 };
 const mockOptions = {
   host: 'localhost',
-  port: 33060,
+  port: 23306,
   database: 'test',
   user: 'test',
   password: 'secret'

@@ -7,6 +7,7 @@ const {
 
 const {
   getUsers,
+  createUser
 } = require('../controller/users');
 
 
@@ -31,10 +32,10 @@ const initAdminUser = (app, next) => {
         password: adminUser.password,
         isAdmin: adminUser.roles.admin
       };
-      let rows;
-      await connection.query('SELECT * FROM users  WHERE email = ?', [newUser.email], (err, succes) => {
+      
+      await connection.query('SELECT * FROM users  WHERE email = ?', [newUser.email], (err, rows) => {
         if (err) console.log(err);
-        rows = succes;
+        
         console.log('length ', rows.length);
         if (rows.length === 0) {
 
@@ -47,11 +48,11 @@ const initAdminUser = (app, next) => {
     }
 
   };
-
   postAdminUser(adminUser, next);
 
   next();
 };
+
 
 
 /*
@@ -122,6 +123,7 @@ module.exports = (app, next) => {
    * @code {404} si la usuaria solicitada no existe
    */
   app.get('/users/:uid', requireAuth, (req, resp) => {
+    
   });
 
   /**
@@ -143,8 +145,8 @@ module.exports = (app, next) => {
    * @code {401} si no hay cabecera de autenticación
    * @code {403} si ya existe usuaria con ese `email`
    */
-  app.post('/users', requireAdmin, (req, resp, next) => {
-    console.log(req.body)
+  app.post('/users', requireAdmin, async (req, resp, next) => {
+  await createUser(req.body,resp, next);
   });
 
   /**

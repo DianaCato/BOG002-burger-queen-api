@@ -23,8 +23,8 @@ const { port, dbUrl, secret } = config;
 const connection = mysql.createConnection({
     host:'localhost',
     port:33060,
-    database:'test',
-    user:'test',
+    database:'bq',
+    user:'bq',
     password:'secret'
 });
 // connection.query('SELECT 1 + 15 AS solution', (error, results) => {

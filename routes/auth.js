@@ -25,15 +25,12 @@ module.exports = (app, nextMain) => {
     if (!email || !password) {
       return next(400);
     }
-    console.log('recived auth: ', req.body);
-    // TODO: autenticar a la usuarix
-    let rows;
-    await connection.query('SELECT * FROM test.users', (err, succes) => {
-      if (err) console.log(err);
-      rows = succes
+    // TODO: autenticar a la usuarix 'SELECT * FROM users  WHERE email = ?', [email], (err, rows)
+    await connection.query('SELECT * FROM users WHERE email =?', [email], (err, rows) => {
+      if (err) console.error(err);
       if (rows.length > 0) {
         const user = rows[0];
-        const passwordEncrypt = bcrypt.hashSync(password, 10);
+        console.log(user)
         matchPassword = (password, savePassword) => {
           try {
             return bcrypt.compare(password, savePassword);
@@ -44,6 +41,7 @@ module.exports = (app, nextMain) => {
         const validPassword = matchPassword(password, user.password);
 
         validPassword.then(res => {
+          console.log(res)
           if (res){
             jwt.sign(
               {
@@ -53,7 +51,7 @@ module.exports = (app, nextMain) => {
               },
               secret,
               {
-                expiresIn: '4h',
+                expiresIn: '6h',
               },
               (err, token) => {
                 if (err) console.error(err);
@@ -62,10 +60,14 @@ module.exports = (app, nextMain) => {
               },
             );
           }else {
+            console.log('error en validate')
          next(404)
           }
-        }).catch(err => console.log(err))
-      }
+        }).catch(err => console.error(err))
+      }else {
+        console.log('error en auth')
+        next(404)
+         }
     });
   });
 
