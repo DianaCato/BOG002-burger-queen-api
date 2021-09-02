@@ -1,11 +1,9 @@
 const path = require('path');
-const jest =require('jest-mock');
 const { spawn } = require('child_process');
 const nodeFetch = require('node-fetch');
 const kill = require('tree-kill');
 const config = require('../config');
 
-const mysql = require('mysql');
 const connection = require('../database');
 const { Console } = require('console');
 
@@ -30,13 +28,6 @@ const __e2e = {
   // that we can clean up before exiting.
   // For example: ['users/foo@bar.baz', 'products/xxx', 'orders/yyy']
   // testObjects: [],
-};
-const mockOptions = {
-  host: 'localhost',
-  port: 23306,
-  database: 'test',
-  user: 'test',
-  password: 'secret'
 };
 
 const fetch = (url, opts = {}) => nodeFetch(`${baseUrl}${url}`, {
@@ -113,25 +104,13 @@ const waitForServerToBeReady = (retries = 10) => new Promise((resolve, reject) =
 });
 
 
-module.exports = () => new Promise(async(resolve, reject) => {
+module.exports = () => new Promise((resolve, reject) => {
   if (process.env.REMOTE_URL) {
     console.info(`Running tests on remote server ${process.env.REMOTE_URL}`);
     return resolve();
   }
 
-  mysql.createConnection = jest.fn();
-  mysql.createConnection.mockImplementation(() => mysql.createConnection(mockOptions));
-
-  await connection.connect();
-  console.log('conectado testing!')
-
-  connection.query('SELECT 1 + 15 AS solution', (error, results) => {
-      if (error) {
-        return console.error(error);
-      }
-      console.log(`The solution is: ${results[0].solution}`);
-    });
-    connection.end();
+  connection.connect();
 
   console.info('Staring local server...');
   const child = spawn('node', ['index.js', process.env.PORT || 8888], {
@@ -166,6 +145,8 @@ module.exports = () => new Promise(async(resolve, reject) => {
     .catch((err) => {
       kill(child.pid, 'SIGKILL', () => reject(err));
     });
+
+  connection.end();
 
 });
 

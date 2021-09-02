@@ -20,7 +20,7 @@ const initAdminUser = (app, next) => {
   const adminUser = {
     email: adminEmail,
     password: bcrypt.hashSync(adminPassword, 10),
-    roles: { admin: true },
+    isAdmin: { admin: true },
   };
 
   // TODO: crear usuaria admin
@@ -32,14 +32,12 @@ const initAdminUser = (app, next) => {
         password: adminUser.password,
         isAdmin: adminUser.roles.admin
       };
-      
+
       await connection.query('SELECT * FROM users  WHERE email = ?', [newUser.email], (err, rows) => {
         if (err) console.log(err);
-        
-        console.log('length ', rows.length);
-        if (rows.length === 0) {
 
-         connection.query('INSERT INTO users SET ?', [newUser]);
+        if (rows.length === 0) {
+          connection.query('INSERT INTO users SET ?', [newUser]);
         }
         return next;
       });
@@ -123,7 +121,7 @@ module.exports = (app, next) => {
    * @code {404} si la usuaria solicitada no existe
    */
   app.get('/users/:uid', requireAuth, (req, resp) => {
-    
+
   });
 
   /**
@@ -146,7 +144,7 @@ module.exports = (app, next) => {
    * @code {403} si ya existe usuaria con ese `email`
    */
   app.post('/users', requireAdmin, async (req, resp, next) => {
-  await createUser(req.body,resp, next);
+    await createUser(req.body, resp, next);
   });
 
   /**

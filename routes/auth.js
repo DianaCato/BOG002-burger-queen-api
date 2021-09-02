@@ -30,24 +30,24 @@ module.exports = (app, nextMain) => {
       if (err) console.error(err);
       if (rows.length > 0) {
         const user = rows[0];
-        console.log(user)
+
         matchPassword = (password, savePassword) => {
           try {
             return bcrypt.compare(password, savePassword);
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }
         const validPassword = matchPassword(password, user.password);
 
         validPassword.then(res => {
-          console.log(res)
-          if (res){
+
+          if (res) {
             jwt.sign(
               {
                 uid: user.id,
                 email: user.email,
-                roles: user.isAdmin,
+                isAdmin: user.isAdmin,
               },
               secret,
               {
@@ -55,19 +55,17 @@ module.exports = (app, nextMain) => {
               },
               (err, token) => {
                 if (err) console.error(err);
-          
+
                 return resp.json({ token });
               },
             );
-          }else {
-            console.log('error en validate')
-         next(404)
+          } else {
+            next(404)
           }
         }).catch(err => console.error(err))
-      }else {
-        console.log('error en auth')
+      } else {
         next(404)
-         }
+      }
     });
   });
 
