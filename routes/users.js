@@ -7,7 +7,9 @@ const {
 
 const {
   getUsers,
-  createUser
+  createUser,
+  getDataUser,
+  postAdminUser
 } = require('../controller/users');
 
 
@@ -24,28 +26,6 @@ const initAdminUser = (app, next) => {
   };
 
   // TODO: crear usuaria admin
-
-  const postAdminUser = async (adminUser, next) => {
-    try {
-      const newUser = {
-        email: adminUser.email,
-        password: adminUser.password,
-        isAdmin: adminUser.roles.admin
-      };
-
-      await connection.query('SELECT * FROM users  WHERE email = ?', [newUser.email], (err, rows) => {
-        if (err) console.error(err);
-
-        if (rows.length === 0) {
-          connection.query('INSERT INTO users SET ?', [newUser]);
-        }
-        return next;
-      });
-    } catch (error) {
-      if (error !== 200) return error;
-    }
-
-  };
   postAdminUser(adminUser, next);
 
   next();
@@ -120,35 +100,7 @@ module.exports = (app, next) => {
    * @code {403} si no es ni admin o la misma usuaria
    * @code {404} si la usuaria solicitada no existe
    */
-  app.get('/users/:uid', requireAuth, (req, resp) => {
-    const getDataUser = () => {
-      const { uid } = req.params;
-      const { isAdmin, email, } = req.userToken;
-      const _id = req.userToken.uid;
-
-      if (!uid) return next(401);
-      if (isAdmin || email === uid || _id == uid) {
-        const querySQL = isNaN(+uid) ? `email = "${uid}"` : `id = ${uid}`;
-        connection.query('SELECT * FROM users  WHERE ' + querySQL, (err, rows) => {
-          if (err) console.error(err);
-          if(rows.length === 0 ) return next(404);
-          const user = {...rows}
-          const {id, email, isAdmin} = user[0];
-          console.log(id, email, isAdmin)
-          resp.json({
-            _id: id,
-            email,
-            roles: {
-              admin: !!isAdmin
-            }
-          })
-        })
-      } else {
-        return next(403);
-      }
-    }
-    getDataUser();
-  });
+  app.get('/users/:uid', requireAuth, getDataUser);
 
   /**
    * @name POST /users
