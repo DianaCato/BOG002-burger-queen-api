@@ -19,7 +19,7 @@ module.exports = (secret) => (req, resp, next) => {
       return next(403);
     }
        // TODO: Verificar identidad del usuario usando `decodeToken.uid`
-     await connection.query('SELECT * FROM users WHERE id = ?', [decodedToken.uid], (err, rows) => {
+     await connection.query('SELECT * FROM users WHERE _id = ?', [decodedToken.uid], (err, rows) => {
         if (err) console.error(err);
        if(!rows) return next(404);
         req.userToken = decodedToken;

@@ -9,7 +9,8 @@ const {
   getUsers,
   createUser,
   getDataUser,
-  postAdminUser
+  postAdminUser,
+  updateUser
 } = require('../controller/users');
 
 
@@ -121,9 +122,7 @@ module.exports = (app, next) => {
    * @code {401} si no hay cabecera de autenticación
    * @code {403} si ya existe usuaria con ese `email`
    */
-  app.post('/users', requireAdmin, async (req, resp, next) => {
-    await createUser(req.body, resp, next);
-  });
+  app.post('/users', requireAdmin, createUser);
 
   /**
    * @name PUT /users
@@ -147,8 +146,7 @@ module.exports = (app, next) => {
    * @code {403} una usuaria no admin intenta de modificar sus `roles`
    * @code {404} si la usuaria solicitada no existe
    */
-  app.put('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.put('/users/:uid', requireAuth, updateUser);
 
   /**
    * @name DELETE /users

@@ -5,7 +5,7 @@ const {
 } = process;
 
 
-describe('POST /orders', () => {
+describe.skip('POST /orders', () => {
   it('should fail with 401 when no auth', () => (
     fetch('/orders', { method: 'POST' })
       .then((resp) => expect(resp.status).toBe(401))
@@ -91,7 +91,7 @@ describe('POST /orders', () => {
 });
 
 
-describe('GET /orders', () => {
+describe.skip('GET /orders', () => {
   it('should fail with 401 when no auth', () => (
     fetch('/orders')
       .then((resp) => expect(resp.status).toBe(401))
@@ -191,7 +191,7 @@ describe('GET /orders', () => {
 });
 
 
-describe('GET /orders/:orderId', () => {
+describe.skip('GET /orders/:orderId', () => {
   it('should fail with 401 when no auth', () => (
     fetch('/orders/xxx')
       .then((resp) => expect(resp.status).toBe(401))
@@ -270,7 +270,7 @@ describe('GET /orders/:orderId', () => {
 });
 
 
-describe('PUT /orders/:orderId', () => {
+describe.skip('PUT /orders/:orderId', () => {
   it('should fail with 401 when no auth', () => (
     fetch('/orders/xxx', { method: 'PUT' })
       .then((resp) => expect(resp.status).toBe(401))
@@ -449,7 +449,7 @@ describe('PUT /orders/:orderId', () => {
 });
 
 
-describe('DELETE /orders/:orderId', () => {
+describe.skip('DELETE /orders/:orderId', () => {
   it('should fail with 401 when no auth', () => (
     fetch('/orders/xxx', { method: 'DELETE' })
       .then((resp) => expect(resp.status).toBe(401))

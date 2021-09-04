@@ -182,7 +182,7 @@ describe('POST /users', () => {
       body: {
         email: 'admin1@test.test',
         password: '12345',
-        isAdmin: { admin: true },
+        roles: { admin: true },
       },
     })
       .then((resp) => {
@@ -220,7 +220,10 @@ describe('PUT /users/:uid', () => {
   ));
 
   it('should fail with 404 when admin and not found', () => (
-    fetchAsAdmin('/users/abc@def.gih', { method: 'PUT' })
+    fetchAsAdmin('/users/abc@def.gih', {
+      method: 'PUT',
+      body: { password: 'garmadon' },
+    })
       .then((resp) => expect(resp.status).toBe(404))
   ));
 
@@ -232,7 +235,7 @@ describe('PUT /users/:uid', () => {
   it('should fail with 403 when not admin tries to change own roles', () => (
     fetchAsTestUser('/users/test@test.test', {
       method: 'PUT',
-      body: { isAdmin: { admin: true } },
+      body: { password: 'garmadon', isAdmin: { admin: true } },
     })
       .then((resp) => expect(resp.status).toBe(403))
   ));
