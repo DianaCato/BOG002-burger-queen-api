@@ -10,7 +10,8 @@ const {
   createUser,
   getDataUser,
   postAdminUser,
-  updateUser
+  updateUser,
+  deleteUser
 } = require('../controller/users');
 
 
@@ -31,8 +32,6 @@ const initAdminUser = (app, next) => {
 
   next();
 };
-
-
 
 /*
  * Diagrama de flujo de una aplicación y petición en node - express :
@@ -164,8 +163,7 @@ module.exports = (app, next) => {
    * @code {403} si no es ni admin o la misma usuaria
    * @code {404} si la usuaria solicitada no existe
    */
-  app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.delete('/users/:uid', requireAuth, deleteUser);
 
   initAdminUser(app, next);
 };

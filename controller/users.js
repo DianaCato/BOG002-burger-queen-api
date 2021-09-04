@@ -96,7 +96,6 @@ const getDataUser = async (req, resp, next) => {
   const { isAdmin, email, } = req.userToken;
   const _id = req.userToken.uid;
 
-  if (!uid) return next(401);
   if (isAdmin || email === uid || _id == uid) {
     const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`;
     await queryGetData(querySQL, resp, next);
@@ -110,15 +109,13 @@ const updateUser = (req, resp, next) => {
   const { isAdmin, email } = req.userToken;
   const _id = req.userToken.uid;
 
-  if (!uid) return next(401);
-
   if (isAdmin || email === uid || _id == uid) {
     if (!req.body.email && !req.body.password) return next(400);
     const editUser = {}
     if(req.body.email)editUser.email = req.body.email;
     if(req.body.password)editUser.password = bcrypt.hashSync(req.body.password, 10);
     if(!isAdmin && req.body.isAdmin) return next(403)
-    const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`;
+    const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`; 
     connection.query('UPDATE users set ? WHERE ' + querySQL, [editUser], async(err, rows) => {
       if (err) console.error(err);
       if (rows.changedRows === 0) return next(404);
@@ -129,10 +126,41 @@ const updateUser = (req, resp, next) => {
     return next(403);
   }
 }
+
+const deleteUser = (req, resp, next) => {
+  const { uid } = req.params;
+  const { isAdmin, email } = req.userToken;
+  const _id = req.userToken.uid;
+
+  if (isAdmin || email === uid || _id == uid) {
+    const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`; 
+    connection.query('SELECT * FROM users  WHERE ' + querySQL, (err, rows) => {
+      if (err) console.error(err);
+      if (rows.length === 0) return next(404);
+      const user = { ...rows }
+      const { _id, email, isAdmin } = user[0];
+      const userData = ({
+          _id,
+          email,
+          roles: {
+              admin: !!isAdmin
+          }
+      })
+      connection.query('DELETE FROM users WHERE _id = ?',[userData._id], (err, rows)=> {
+        if (err) console.error(err);
+        resp.json(userData).status(200)
+      })
+  })
+  }else{
+    return next(403)
+  }
+}
+
 module.exports = {
   postAdminUser,
   getUsers,
   createUser,
   getDataUser,
-  updateUser
+  updateUser,
+  deleteUser
 };
