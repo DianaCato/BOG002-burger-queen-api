@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const connection = require('../database');
 
 module.exports = (secret) => (req, resp, next) => {
   const { authorization } = req.headers;
@@ -13,26 +14,25 @@ module.exports = (secret) => (req, resp, next) => {
     return next();
   }
 
-  jwt.verify(token, secret, (err, decodedToken) => {
+  jwt.verify(token, secret, async (err, decodedToken) => {
     if (err) {
       return next(403);
     }
-
-    // TODO: Verificar identidad del usuario usando `decodeToken.uid`
+       // TODO: Verificar identidad del usuario usando `decodeToken.uid`
+     await connection.query('SELECT * FROM users WHERE _id = ?', [decodedToken.uid], (err, rows) => {
+        if (err) console.error(err);
+       if(!rows) return next(404);
+        req.userToken = decodedToken;
+        return next()
+    })
   });
 };
 
+ // TODO: decidir por la informacion del request si la usuaria esta autenticada
+module.exports.isAuthenticated = (req) =>(!!req.userToken);
 
-module.exports.isAuthenticated = (req) => (
-  // TODO: decidir por la informacion del request si la usuaria esta autenticada
-  false
-);
-
-
-module.exports.isAdmin = (req) => (
-  // TODO: decidir por la informacion del request si la usuaria es admin
-  false
-);
+ // TODO: decidir por la informacion del request si la usuaria es admin
+module.exports.isAdmin = (req) => (!!req.userToken.isAdmin);
 
 
 module.exports.requireAuth = (req, resp, next) => (

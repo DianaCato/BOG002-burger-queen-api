@@ -4,15 +4,20 @@ const authMiddleware = require('./middleware/auth');
 const errorHandler = require('./middleware/error');
 const routes = require('./routes');
 const pkg = require('./package.json');
+const morgan = require('morgan');
 
 const { port, dbUrl, secret } = config;
 const app = express();
 
-// TODO: Conexión a la Base de Datos (MongoDB o MySQL)
+// Conexión a la Base de Datos (MySQL)
+
+const db = require('./database');
+db.connect();
 
 app.set('config', config);
 app.set('pkg', pkg);
 
+app.use(morgan('dev'));
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

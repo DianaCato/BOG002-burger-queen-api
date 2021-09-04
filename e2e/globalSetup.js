@@ -2,8 +2,10 @@ const path = require('path');
 const { spawn } = require('child_process');
 const nodeFetch = require('node-fetch');
 const kill = require('tree-kill');
-
 const config = require('../config');
+
+const connection = require('../database');
+const { Console } = require('console');
 
 const port = process.env.PORT || 8888;
 const baseUrl = process.env.REMOTE_URL || `http://127.0.0.1:${port}`;
@@ -27,7 +29,6 @@ const __e2e = {
   // For example: ['users/foo@bar.baz', 'products/xxx', 'orders/yyy']
   // testObjects: [],
 };
-
 
 const fetch = (url, opts = {}) => nodeFetch(`${baseUrl}${url}`, {
   ...opts,
@@ -103,16 +104,16 @@ const waitForServerToBeReady = (retries = 10) => new Promise((resolve, reject) =
 });
 
 
-module.exports = () => new Promise((resolve, reject) => {
+module.exports = () => new Promise(async (resolve, reject) => {
   if (process.env.REMOTE_URL) {
     console.info(`Running tests on remote server ${process.env.REMOTE_URL}`);
     return resolve();
   }
 
-  // TODO: Configurar DB de tests
+  await connection.connect();
 
   console.info('Staring local server...');
-  const child = spawn('npm', ['start', process.env.PORT || 8888], {
+  const child = spawn('node', ['index.js', process.env.PORT || 8888], {
     cwd: path.resolve(__dirname, '../'),
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -144,6 +145,9 @@ module.exports = () => new Promise((resolve, reject) => {
     .catch((err) => {
       kill(child.pid, 'SIGKILL', () => reject(err));
     });
+
+  connection.end();
+
 });
 
 // Export globals - ugly... :-(
