@@ -1,7 +1,8 @@
 const { isAdmin } = require('../middleware/auth');
+const connection = require('../database');
+const bcrypt = require('bcrypt');
 
 const postAdminUser = (adminUser, next) => {
-  const connection = require('../database');
   const newUser = {
     ...adminUser,
     isAdmin: adminUser.isAdmin.admin
@@ -22,11 +23,42 @@ const postAdminUser = (adminUser, next) => {
 };
 
 const getUsers = (req, resp, next) => {
+  const { page = 1, limit = 10 } = req.query;
+  const queryPage = (page - 1) * limit;
+  const url = `${req.protocol}://${req.get('host')}${req.path}`;
+  const totalPages = connection.query('SELECT * FROM users', (err, rows) => {
+    return Math.ceil(rows.length / limit);
+  })
+
+  try {
+    connection.query(`SELECT id, email, isAdmin FROM users LIMIT ${queryPage}, ${limit}`, (err, rows) => {
+      if (err) console.error(err);
+      const data = [...rows]
+
+      const users = data.map(row => {
+        return {
+          _id: row.id,
+          email: row.email,
+          roles: {
+            admin: !!row.isAdmin
+          }
+        }
+      })
+
+      resp.links({
+        first: `${url}?limit=${limit}&page=1`,
+        prev: page > 1 ? `${url}?limit=${limit}&page=${page - 1}` : `${url}?limit=${limit}&page=${page}`,
+        next: page < totalPages ? `${url}?limit=${limit}&page=${page + 1}` : `${url}?limit=${limit}&page=${page}`,
+        last: `${url}?limit=${limit}&page=${totalPages}`
+      }).json(users)
+
+    })
+  } catch (error) {
+    return next(error)
+  }
 };
 
 const createUser = async (dataUser, resp, next) => {
-  const bcrypt = require('bcrypt');
-  const connection = require('../database');
   const { email, password } = dataUser;
 
   if (!email || !password) return next(400)
@@ -62,7 +94,6 @@ const createUser = async (dataUser, resp, next) => {
 };
 
 const getDataUser = async (req, resp, next) => {
-  const connection = require('../database');
   const { uid } = req.params;
   const { isAdmin, email, } = req.userToken;
   const _id = req.userToken.uid;
