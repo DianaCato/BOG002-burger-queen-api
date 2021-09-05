@@ -3,6 +3,7 @@ const { spawn } = require('child_process');
 const nodeFetch = require('node-fetch');
 const kill = require('tree-kill');
 const config = require('../config');
+
 const connection = require('../database');
 const { Console } = require('console');
 
@@ -28,7 +29,6 @@ const __e2e = {
   // For example: ['users/foo@bar.baz', 'products/xxx', 'orders/yyy']
   // testObjects: [],
 };
-
 
 const fetch = (url, opts = {}) => nodeFetch(`${baseUrl}${url}`, {
   ...opts,

@@ -1,7 +1,7 @@
 const { isAdmin } = require('../middleware/auth');
 const connection = require('../database');
 const bcrypt = require('bcrypt');
-const { queryGetDataUser } = require('../helpers/queryDb');
+const { queryGetData } = require('../helpers/queryDb');
 
 const postAdminUser = (adminUser, next) => {
   const newUser = {
@@ -98,7 +98,7 @@ const getDataUser = async (req, resp, next) => {
 
   if (isAdmin || email === uid || _id == uid) {
     const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`;
-    await queryGetDataUser(querySQL, resp, next);
+    await queryGetData(querySQL, resp, next);
   } else {
     return next(403);
   }
@@ -120,7 +120,7 @@ const updateUser = (req, resp, next) => {
       if (err) console.error(err);
       if (rows.changedRows === 0) return next(404);
       
-      await queryGetDataUser(querySQL, resp, next);
+      await queryGetData(querySQL, resp, next);
     })
   } else {
     return next(403);
