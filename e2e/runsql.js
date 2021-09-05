@@ -1,8 +1,10 @@
 const Runner = require("run-my-sql-file");
- 
+
+const dbPort = process.env.DB_PORT || 23306;
+
 Runner.connectionOptions({
    host:"localhost",
-   port: 23306,
+   port: dbPort,
    user:"root",
    password:"supersecret"
 });
