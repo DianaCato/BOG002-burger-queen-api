@@ -2,6 +2,7 @@ const { isAdmin } = require('../middleware/auth');
 const connection = require('../database');
 const bcrypt = require('bcrypt');
 const { queryGetDataUser } = require('../helpers/queryDb');
+const pagination = require('../helpers/pagination');
 
 const postAdminUser = (adminUser, next) => {
   const newUser = {
@@ -30,6 +31,7 @@ const getUsers = async (req, resp, next) => {
 
   connection.query('SELECT * FROM users', (err, rows) => {
     const totalPages = Math.ceil(rows.length / limit);
+    const links = pagination(url, limit, page, totalPages);
     try {
       connection.query(`SELECT _id, email, isAdmin FROM users LIMIT ${queryPage}, ${limit}`, (err, rows) => {
         if (err) console.error(err);
@@ -43,12 +45,7 @@ const getUsers = async (req, resp, next) => {
             }
           }
         })
-        resp.links({
-          first: `${url}?limit=${limit}&page=1`,
-          prev: `${url}?limit=${limit}&page=${page - 1}`,
-          next: `${url}?limit=${limit}&page=${page + 1}`,
-          last: `${url}?limit=${limit}&page=${totalPages}`
-        }).json(users)
+        resp.links(links).json(users)
       })
     } catch (error) {
       return next(error)
@@ -102,7 +99,7 @@ const getDataUser = async (req, resp, next) => {
   } else {
     return next(403);
   }
-}
+};
 
 const updateUser = (req, resp, next) => {
   const { uid } = req.params;
@@ -112,20 +109,20 @@ const updateUser = (req, resp, next) => {
   if (isAdmin || email === uid || _id == uid) {
     if (!req.body.email && !req.body.password) return next(400);
     const editUser = {}
-    if(req.body.email)editUser.email = req.body.email;
-    if(req.body.password)editUser.password = bcrypt.hashSync(req.body.password, 10);
-    if(!isAdmin && req.body.isAdmin) return next(403)
-    const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`; 
-    connection.query('UPDATE users set ? WHERE ' + querySQL, [editUser], async(err, rows) => {
+    if (req.body.email) editUser.email = req.body.email;
+    if (req.body.password) editUser.password = bcrypt.hashSync(req.body.password, 10);
+    if (!isAdmin && req.body.isAdmin) return next(403)
+    const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`;
+    connection.query('UPDATE users set ? WHERE ' + querySQL, [editUser], async (err, rows) => {
       if (err) console.error(err);
       if (rows.changedRows === 0) return next(404);
-      
+
       await queryGetDataUser(querySQL, resp, next);
     })
   } else {
     return next(403);
   }
-}
+};
 
 const deleteUser = (req, resp, next) => {
   const { uid } = req.params;
@@ -133,28 +130,28 @@ const deleteUser = (req, resp, next) => {
   const _id = req.userToken.uid;
 
   if (isAdmin || email === uid || _id == uid) {
-    const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`; 
+    const querySQL = isNaN(+uid) ? `email = "${uid}"` : `_id = ${uid}`;
     connection.query('SELECT * FROM users  WHERE ' + querySQL, (err, rows) => {
       if (err) console.error(err);
       if (rows.length === 0) return next(404);
       const user = { ...rows }
       const { _id, email, isAdmin } = user[0];
       const userData = ({
-          _id,
-          email,
-          roles: {
-              admin: !!isAdmin
-          }
+        _id,
+        email,
+        roles: {
+          admin: !!isAdmin
+        }
       })
-      connection.query('DELETE FROM users WHERE _id = ?',[userData._id], (err, rows)=> {
+      connection.query('DELETE FROM users WHERE _id = ?', [userData._id], (err, rows) => {
         if (err) console.error(err);
         resp.json(userData).status(200)
       })
-  })
-  }else{
+    })
+  } else {
     return next(403)
   }
-}
+};
 
 module.exports = {
   postAdminUser,

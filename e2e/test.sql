@@ -11,13 +11,13 @@ CREATE TABLE users (
 );
 
 CREATE TABLE products (
-  id_product int(11) NOT NULL AUTO_INCREMENT,
+  _id int(11) NOT NULL AUTO_INCREMENT,
   name varchar(45) NOT NULL,
   price double NOT NULL,
   imagen longtext,
   type varchar(45) DEFAULT NULL,
   dateEntry date NOT NULL,
-  PRIMARY KEY (id_product)
+  PRIMARY KEY (_id)
 );
 
 CREATE TABLE orders (
