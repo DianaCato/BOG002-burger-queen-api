@@ -279,7 +279,7 @@ describe('PUT /orders/:orderId', () => {
   it('should fail with 404 when not found', () => (
     fetchAsAdmin('/orders/xxx', {
       method: 'PUT',
-      body: { state: 'canceled' },
+      body: { status: 'canceled' },
     })
       .then((resp) => expect(resp.status).toBe(404))
   ));

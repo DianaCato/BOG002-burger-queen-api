@@ -32,8 +32,8 @@ CREATE TABLE orders (
   CONSTRAINT userId
     FOREIGN KEY (userId)
     REFERENCES test.users (_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
 
 CREATE TABLE `products_in_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -43,7 +43,7 @@ CREATE TABLE `products_in_order` (
   PRIMARY KEY (`id`),
   KEY `id_order` (`id_order`),
   KEY `id_product` (`id_product`),
-  CONSTRAINT `id_order` FOREIGN KEY (`id_order`) REFERENCES `orders` (`_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `id_product` FOREIGN KEY (`id_product`) REFERENCES `products` (`_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `id_order` FOREIGN KEY (`id_order`) REFERENCES `orders` (`_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `id_product` FOREIGN KEY (`id_product`) REFERENCES `products` (`_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

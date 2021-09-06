@@ -67,7 +67,7 @@ const createUser = async (req, resp, next) => {
   try {
     await connection.query('SELECT * FROM users  WHERE email = ?', [email], (err, rows) => {
 
-      if (err) console.log(err);
+      if (err) console.error(err);
       if (rows.length === 0) {
         connection.query('INSERT INTO users SET ?', [newUser], (err, row) => {
           if (err) console.error(err);
