@@ -1,4 +1,6 @@
-const { createOrder } = require('../controller/orders');
+const { createOrder,
+  getOrders
+} = require('../controller/orders');
 const {
   requireAuth,
 } = require('../middleware/auth');
@@ -31,8 +33,7 @@ module.exports = (app, nextMain) => {
    * @code {200} si la autenticación es correcta
    * @code {401} si no hay cabecera de autenticación
    */
-  app.get('/orders', requireAuth, (req, resp, next) => {
-  });
+  app.get('/orders', requireAuth, getOrders);
 
   /**
    * @name GET /orders/:orderId
