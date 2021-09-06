@@ -23,8 +23,7 @@ CREATE TABLE products (
 CREATE TABLE orders (
   _id INT NOT NULL AUTO_INCREMENT,
   userId INT NOT NULL,
-  client VARCHAR(45) NOT NULL,
-  products longtext NOT NULL,
+  client VARCHAR(45) DEFAULT NULL,
   status VARCHAR(45) NOT NULL,
   dateEntry DATE NOT NULL,
   dateProcessed DATE DEFAULT NULL,
@@ -35,3 +34,16 @@ CREATE TABLE orders (
     REFERENCES test.users (_id)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
+
+CREATE TABLE `products_in_order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_order` int(11) NOT NULL,
+  `id_product` int(11) NOT NULL,
+  `qty` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_order` (`id_order`),
+  KEY `id_product` (`id_product`),
+  CONSTRAINT `id_order` FOREIGN KEY (`id_order`) REFERENCES `orders` (`_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `id_product` FOREIGN KEY (`id_product`) REFERENCES `products` (`_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+

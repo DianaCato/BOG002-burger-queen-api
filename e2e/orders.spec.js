@@ -41,14 +41,14 @@ describe('POST /orders', () => {
       })
       .then(([product, user]) => fetchAsTestUser('/orders', {
         method: 'POST',
-        body: { products: [{ productId: product._id, qty: 5, client: 'client' }], userId: user._id },
+        body: { products: [{ productId: product._id, qty: 5}], userId: user._id, client: 'client'  },
       }))
       .then((resp) => {
         expect(resp.status).toBe(200);
         return resp.json();
       })
       .then((json) => {
-        expect(typeof json._id).toBe('string');
+        expect(typeof json._id).toBe('number');
         expect(json.client).toBe('client');
         expect(typeof json.dateEntry).toBe('string');
         expect(Array.isArray(json.products)).toBe(true);
@@ -80,7 +80,7 @@ describe('POST /orders', () => {
         return resp.json();
       })
       .then((json) => {
-        expect(typeof json._id).toBe('string');
+        expect(typeof json._id).toBe('number');
         expect(typeof json.dateEntry).toBe('string');
         expect(Array.isArray(json.products)).toBe(true);
         expect(json.products.length).toBe(1);
