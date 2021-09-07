@@ -82,7 +82,7 @@ console.log('update')
       // if (products) {
       //   querySetProductsInOrder(products, orderId);
       // }
-      queryGetOrdersWhitId( 2, resp, next);
+      queryGetOrdersWhitId(orderId , resp, next);
     })
  }else {
    return next(400)

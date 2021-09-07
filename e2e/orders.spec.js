@@ -361,6 +361,7 @@ describe('PUT /orders/:orderId', () => {
         return resp.json();
       })
       .then((json) => {
+        console.log('change pending')
         expect(json.status).toBe('pending');
         return fetchAsAdmin(`/orders/${json._id}`, {
           method: 'PUT',
